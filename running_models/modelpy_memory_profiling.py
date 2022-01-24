@@ -1,5 +1,6 @@
 """
-This script is for running multiple
+This script is for calculating the difference in time and memory consumption between modelpy and modelpy with a
+data server. This script should be run in the same director as the model data.
 """
 import os
 import pickle
