@@ -123,7 +123,7 @@ class MemoryProfiler(Process):
 
     def run(self) -> None:
         """
-        Runs when the MemoryProfiler process starts (overwritten from the super().Process class).
+        Runs when the MemoryProfiler process starts (overwritten from the supear().Process class).
 
         Returns: None
         """
