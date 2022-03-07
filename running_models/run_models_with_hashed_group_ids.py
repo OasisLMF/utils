@@ -67,11 +67,37 @@ def compare_data(hash_output_dict: Dict[str, str], none_hash_output_dict: Dict[s
         print(f"there is no difference between hash and none hash for {key}")
 
 
+def generate_location_data(remove_location: bool = False) -> pd.DataFrame:
+    data = [
+        [1,1,1,"Hotel Ronceray Opera",48.874979,2.30887,5150,1000000,0,0,0,"WTC","EUR","FR",10000,500000],
+        [1,1,2,"Gare Du Nord",48.876918,2.324729,5050,2000000,0,0,0,"WTC","EUR","FR",25000,1000000],
+        [1,1,3,"Art Supply Store",48.85324,2.387931,5150,500000,0,0,0,"WTC","EUR","FR",0,0]
+    ]
+    if remove_location is True:
+        data = data[1:]
+    columns = [
+        "PortNumber","AccNumber","LocNumber","LocName","Latitude","Longitude","ConstructionCode","BuildingTIV",
+        "OtherTIV","ContentsTIV","BITIV","LocPerilsCovered","LocCurrency","CountryCode","LocDed6All","LocLimit6All"
+    ]
+    df = pd.DataFrame(data, columns=columns)
+    return df
+
+
 if __name__ == "__main__":
     # cleanup the previous runs
     main_path: str = str(Path.cwd())
     remove_runs = Popen(f"rm -r ./runs/", shell=True)
     remove_runs.wait()
+
+    # setup the datasets for locations
+    # "oed_location_csv": "tests/location.csv"
+    locations = generate_location_data()
+    reduced_locations = generate_location_data(remove_location=True)
+
+    # write the location data
+    locations.to_csv("./tests/full_locations.csv", index=False)
+    reduced_locations.to_csv("./tests/reduced_locations.csv", index=False)
+    mdk_config["oed_location_csv"] = "tests/full_locations.csv"
 
     # update the local oasislmf pip module
     update_oasislmf = Popen("screw-update-local-oasislmf")
@@ -84,9 +110,9 @@ if __name__ == "__main__":
     run_model = Popen(f"oasislmf model run --config ./hash_test_mdk.json", shell=True)
     run_model.wait()
 
-    hash_run_path: str = rename_directory(directory_path=get_recent_run_path(), new_file_name="hashed_run")
+    hash_run_path: str = rename_directory(directory_path=get_recent_run_path(), new_file_name="full_location_run")
 
-    mdk_config["hashed_group_id"] = False
+    mdk_config["oed_location_csv"] = "tests/reduced_locations.csv"
 
     with open(f"./none_hash_test_mdk.json", "w") as file:
         file.write(json.dumps(mdk_config))
@@ -94,7 +120,7 @@ if __name__ == "__main__":
     run_model = Popen(f"oasislmf model run --config ./none_hash_test_mdk.json", shell=True)
     run_model.wait()
 
-    none_hash_run_path: str = rename_directory(directory_path=get_recent_run_path(), new_file_name="none_hashed_run")
+    none_hash_run_path: str = rename_directory(directory_path=get_recent_run_path(), new_file_name="reduced_locations_run")
 
     hashed_outputs = get_output_files(run_directory=hash_run_path)
     none_hashed_outputs = get_output_files(run_directory=none_hash_run_path)
