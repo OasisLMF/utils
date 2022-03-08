@@ -52,6 +52,7 @@ def get_output_files(run_directory: str) -> Dict[str, str]:
 
 
 def compare_data(hash_output_dict: Dict[str, str], none_hash_output_dict: Dict[str, str], key: str) -> None:
+
     hash_data_path: str = hash_output_dict[key]
     none_hash_data_path: str = none_hash_output_dict[key]
 
@@ -60,6 +61,7 @@ def compare_data(hash_output_dict: Dict[str, str], none_hash_output_dict: Dict[s
 
     difference = pd.concat([hash_df, non_hash_df]).drop_duplicates(keep=False)
 
+    print(f"left number is {len(hash_df)} right number is {len(non_hash_df)}")
     if len(difference) > 0:
         print(f"the difference between hash and none hash for {key} is {len(difference)}")
         print(difference.head())
